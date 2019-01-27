@@ -33,9 +33,6 @@
 Adafruit_NeoPixel pixelsLeft = Adafruit_NeoPixel(NUM_PIXELS, LEFT_EYE, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel pixelsRight = Adafruit_NeoPixel(NUM_PIXELS, RIGHT_EYE, NEO_GRBW + NEO_KHZ800);
 
-int8_t leftEyeColor[3];
-int8_t rightEyeColor[3];
-
 bool is_connected = false;
 
 void move(bool direction, int speed) {
@@ -150,7 +147,7 @@ void turnOffTop() {
   analogWrite(TOP_SIGNAL, 0);
 }
 
-void setLeftEyeColor(int *color) {
+void setLeftEyeColor(int8_t *color) {
 
   for(int i=0;i<NUM_PIXELS;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
@@ -159,7 +156,7 @@ void setLeftEyeColor(int *color) {
   pixelsLeft.show();
 }
 
-void setRightEyeColor(int *color) {
+void setRightEyeColor(int8_t *color) {
 
   for(int i=0;i<NUM_PIXELS;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
@@ -186,62 +183,67 @@ void handleCommand(RobotCommand command){
       }
 	  break;
     }
-    case RobotOrderResponse.ALREADY_CONNECTED:
+    case RobotOrderType.ALREADY_CONNECTED:
     {
       is_connected = true;
 	  break;
     }
-    case RobotOrderResponse.DISCO_BALL:
+    case RobotOrderType.DISCO_BALL:
     {
       turnOnTop();
       break;
     }
-    case RobotOrderResponse.LEFT_EYE_COLOR:
+    case RobotOrderType.LEFT_EYE_COLOR:
     {
-      setLeftEyeColor();
+	  int8_t leftEyeColor[3] = {command.data1, command.data2, command.data3};
+      setLeftEyeColor(leftEyeColor);
       break;
     }
-    case RobotOrderResponse.RIGHT_EYE_COLOR:
+    case RobotOrderType.RIGHT_EYE_COLOR:
     {
-      setRightEyeColor();
+	  int8_t rightEyeColor[3] = {command.data1, command.data2, command.data3};
+      setRightEyeColor(rightEyeColor);
       break;
     }
-    case RobotOrderResponse.LEFT_ARM:
+    case RobotOrderType.LEFT_ARM:
     {
       rotateLeftArm(true, 100);
       break;
     }
-    case RobotOrderResponse.RIGHT_ARM:
+    case RobotOrderType.RIGHT_ARM:
     {
       rotateRightArm(true, 100);
       break;
     }
-    case RobotOrderResponse.FORWARD:
+    case RobotOrderType.FORWARD:
     {
       move(true, 100);
       break;
     }
-    case RobotOrderResponse.BACKWARD:
+    case RobotOrderType.BACKWARD:
     {
       move(false, 100);
       break;
     }
-    case RobotOrderResponse.TURN_LEFT:
+    case RobotOrderType.TURN_LEFT:
     {
       rotate(true, 100);
       break;
     }
-    case RobotOrderResponse.TURN_RIGHT:
+    case RobotOrderType.TURN_RIGHT:
     {
       rotate(false, 100);
       break;
     }
-    case RobotOrderResponse.STOP:
+    case RobotOrderType.STOP:
     {
       stop();
       stopLeftArm();
       stopRightArm();
       turnOffTop();
+	  int8_t offColor[3] = {0, 0, 0};
+      setLeftEyeColor(offColor);
+	  setRightEyeColor(offColor);
       break;
     }
     // Unknown order
