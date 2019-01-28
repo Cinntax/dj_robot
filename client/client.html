@@ -1,0 +1,100 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<style>
+			.col {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container" id="vueapp">
+			<div class="row">
+				<div class="col">
+					<button v-on:click="sendCommand(1,1)">Disco Ball</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+				  <input type="color" v-model="leftEyeColor" id="leftEyeColor" @change="sendLeftEye"></input>
+				</div>
+				<div class="col">
+				  <input type="color"  v-model="rightEyeColor" id="rightEyeColor" @change="sendRightEye"></input>
+				</div>
+			</div>	
+			<div class="row">
+				<div class="col">
+				  <button v-on:click="sendCommand(4,4)">Left Arm</button>
+				</div>
+				<div class="col">
+				  <button v-on:click="sendCommand(5,5)">Right Arm</button>
+				</div>
+			</div>	
+			<div class="row">
+				<div class="col">
+				  <button v-on:click="sendCommand(6,6)">Forward</button>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<button v-on:click="sendCommand(8,7)">Left</button>
+				</div>
+				<div class="col">
+					<button v-on:click="sendCommand(9,7)">Right</button>
+				</div>
+			</div>	
+			<div class="row">
+				<div class="col">
+					<button v-on:click="sendCommand(7,6)">Backward</button>	
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<button v-on:click="sendCommand(13,6)">Stop</button>	
+				</div>
+			</div>
+		</div>
+		
+		<script>			
+			var app = new Vue({
+				el: '#vueapp',
+				data: {
+					message: 'Hello Vue!',
+					leftEyeColor: 0,
+					rightEyeColor: 0,
+				},
+				methods: {
+					sendCommand: function(cmd, param) {
+						console.log("Command: " + cmd + " Param: " + param)
+						
+						axios.get('http://10.6.24.108:5000/' + cmd + '/' + param)
+						  .then(function (response) {
+							// handle success
+							console.log(response);
+						  })
+						  .catch(function (error) {
+							// handle error
+							console.log(error);
+						  });
+					},
+					sendLeftEye: function() {
+						this.sendCommand(2, this.leftEyeColor.replace("#",""))
+						
+					},
+					sendRightEye: function() {
+						this.sendCommand(3, this.rightEyeColor.replace("#",""))
+					}
+				}
+			})
+			
+		</script>
+		
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+	</body>
+</html>
