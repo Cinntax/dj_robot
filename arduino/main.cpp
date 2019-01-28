@@ -183,11 +183,6 @@ void handleCommand(RobotOrder command){
       }
 	  break;
     }
-    case ALREADY_CONNECTED:
-    {
-      is_connected = true;
-	  break;
-    }
     case DISCO_BALL:
     {
       turnOnTop();
