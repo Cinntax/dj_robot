@@ -27,10 +27,10 @@ enum RobotOrderResponse {
 typedef enum RobotOrderType RobotOrderType;
 typedef enum RobotOrderResponse RobotOrderResponse;
 
-typedef struct RobotOrder {
+typedef struct RobotOrders {
   RobotOrderType type;
   int8_t data1;
   int8_t data2;
   int8_t data3;
-};
+} RobotOrder;
 #endif

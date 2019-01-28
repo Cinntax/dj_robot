@@ -166,7 +166,7 @@ void setRightEyeColor(int8_t *color) {
 }
 
 
-void handleCommand(RobotCommand command){
+void handleCommand(RobotOrder command){
   switch(command.type) {
     case HELLO:
     {

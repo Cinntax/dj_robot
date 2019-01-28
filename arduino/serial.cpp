@@ -11,7 +11,7 @@ RobotOrderType read_order(){
   if(Serial.available() > 0)
     return (RobotOrderType) Serial.read();
   else
-	return RobotOrderType.NOOP;
+	return NOOP;
 }
 
 //This is used when I want to get multiple bytes from the stream.
