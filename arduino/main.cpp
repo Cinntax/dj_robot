@@ -168,74 +168,74 @@ void setRightEyeColor(int8_t *color) {
 
 void handleCommand(RobotCommand command){
   switch(command.type) {
-    case RobotOrderType.HELLO:
+    case HELLO:
     {
       // If the cards haven't say hello, check the connection
       if(!is_connected)
       {
         is_connected = true;
-        write_order(RobotOrderResponse.THERE);
+        write_order(THERE);
       }
       else
       {
         // If we are already connected do not send "hello" to avoid infinite loop
-        write_order(RobotOrderResponse.ALREADY_CONNECTED);
+        write_order(ALREADY_CONNECTED);
       }
 	  break;
     }
-    case RobotOrderType.ALREADY_CONNECTED:
+    case ALREADY_CONNECTED:
     {
       is_connected = true;
 	  break;
     }
-    case RobotOrderType.DISCO_BALL:
+    case DISCO_BALL:
     {
       turnOnTop();
       break;
     }
-    case RobotOrderType.LEFT_EYE_COLOR:
+    case LEFT_EYE_COLOR:
     {
 	  int8_t leftEyeColor[3] = {command.data1, command.data2, command.data3};
       setLeftEyeColor(leftEyeColor);
       break;
     }
-    case RobotOrderType.RIGHT_EYE_COLOR:
+    case RIGHT_EYE_COLOR:
     {
 	  int8_t rightEyeColor[3] = {command.data1, command.data2, command.data3};
       setRightEyeColor(rightEyeColor);
       break;
     }
-    case RobotOrderType.LEFT_ARM:
+    case LEFT_ARM:
     {
       rotateLeftArm(true, 100);
       break;
     }
-    case RobotOrderType.RIGHT_ARM:
+    case RIGHT_ARM:
     {
       rotateRightArm(true, 100);
       break;
     }
-    case RobotOrderType.FORWARD:
+    case FORWARD:
     {
       move(true, 100);
       break;
     }
-    case RobotOrderType.BACKWARD:
+    case BACKWARD:
     {
       move(false, 100);
       break;
     }
-    case RobotOrderType.TURN_LEFT:
+    case TURN_LEFT:
     {
       rotate(true, 100);
       break;
     }
-    case RobotOrderType.TURN_RIGHT:
+    case TURN_RIGHT:
     {
       rotate(false, 100);
       break;
     }
-    case RobotOrderType.STOP:
+    case STOP:
     {
       stop();
       stopLeftArm();
@@ -248,10 +248,10 @@ void handleCommand(RobotCommand command){
     }
     // Unknown order
     default:
-      write_order(RobotOrderResponse.ERROR);
+      write_order(ERROR);
       return;
   }
-  write_order(RobotOrderResponse.RECEIVED); // Confirm the reception
+  write_order(RECEIVED); // Confirm the reception
 }
 
 void setup()

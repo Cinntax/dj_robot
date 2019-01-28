@@ -35,11 +35,11 @@ void read_color(int8_t* buffer) {
 RobotOrder get_command_from_serial(){
   RobotOrderType current_order = read_order();
   RobotOrder return_value;
-  while(current_order == RobotOrderType.NOOP) {
+  while(current_order == NOOP) {
     current_order = read_order();
   }
   return_value.type = current_order;
-  if (current_order == RobotOrderType.LEFT_EYE_COLOR || current_order == RobotOrderType.RIGHT_EYE_COLOR){
+  if (current_order == LEFT_EYE_COLOR || current_order == RIGHT_EYE_COLOR){
     int8_t color[3];
 	read_color(color);
 	return_value.data1 = color[0];
