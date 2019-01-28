@@ -1,3 +1,6 @@
+#ifndef ORDER_H
+#define ORDER_H
+#include <Arduino.h>
 //Contains the definition of the orders that our robot will accept from the main computer.
 enum RobotOrderType {
   HELLO = 0,
@@ -15,7 +18,7 @@ enum RobotOrderType {
 };
 
 enum RobotOrderResponse {
-  HELLO = 0,
+  THERE = 0,
   RECEIVED = 1,
   ERROR = 2,
   ALREADY_CONNECTED = 3
@@ -30,3 +33,4 @@ typedef struct RobotOrder {
   int8_t data2;
   int8_t data3;
 };
+#endif

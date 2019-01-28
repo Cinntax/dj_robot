@@ -174,7 +174,7 @@ void handleCommand(RobotCommand command){
       if(!is_connected)
       {
         is_connected = true;
-        write_order(RobotOrderResponse.HELLO);
+        write_order(RobotOrderResponse.THERE);
       }
       else
       {
