@@ -4,12 +4,18 @@ from flask_cors import CORS
 
 import serial
 import time
-from robot_serial import RobotOrder, write_order, write_i8, read_i8, read_order, write_color
+import subprocess
+import random
+import threading
+
+from robot_serial import RobotOrder, write_order, read_order, get_color
 
 app = Flask(__name__)
 CORS(app)
 global is_connected
 global serial_file
+global player_process
+player_process = None
 is_connected = False
 
 try:
@@ -47,30 +53,78 @@ wait_for_connect()
 def hello():
   return "Welcome to dj robot!"
 
-@app.route('/<order>/<param>')
+@app.route('/<int:order>/<param>')
 def command(order, param):
   global serial_file
   global is_connected
+  global player_process
   if is_connected:
     try:
 	  current_order = RobotOrder(int(order))
     except:
       return '{"status": "ERROR", "msg":"Invalid command."}'
 	  
-    write_order(serial_file, RobotOrder(int(order)))
-	
-    if current_order in [RobotOrder.LEFT_EYE_COLOR, RobotOrder.RIGHT_EYE_COLOR]:
-        print("color sent in- sending.")
-        write_color(serial_file, param)
+	if current_order == RobotOrder.DANCE: #We want to run this on the RPI, and not the arduino.
+      print("playing music...")
+      if player_process is None:
+        player_process = subprocess.Popen(['/usr/bin/play', get_random_song()])
+        dance()
+		
+    elif current_order == RobotOrder.STOP:
+      try:
+        write_order(serial_file, RobotOrder(int(order)), [])
+        player_process.terminate()
+        player_process = None
+      except:
+        print("No music playing- not stopping.")  
 
+    elif current_order in [RobotOrder.LEFT_EYE_COLOR, RobotOrder.RIGHT_EYE_COLOR]:
+      print("color sent in- sending.")
+      write_order(serial_file, RobotOrder(int(order)), get_color(param))
+    else:
+      data = param.split("|")
+      write_order(serial_file, RobotOrder(int(order)), data)
+    
     response = read_order(serial_file)
 	
-    if not response:
-      is_connected = False
-      return '{"status": "ERROR", "msg":"Lost connection with the arduino."}'
-    elif response == RobotOrder.RECEIVED:
+      if not response:
+        is_connected = False
+        return '{"status": "ERROR", "msg":"Lost connection with the arduino."}'
+      elif response == RobotOrder.RECEIVED:
+        return '{"status": "SUCCESS", "msg":"Command run successfully!"}'
+      else:
+        return '{"status": "ERROR", "msg":"The arduino failed to run your command."}'
+    
       return '{"status": "SUCCESS", "msg":"Command run successfully!"}'
-    else:
-      return '{"status": "ERROR", "msg":"The arduino failed to run your command."}'
+	  
   else:
     return '{"status": "ERROR", "msg":"Arduino is not connected."}'
+	
+def get_random_song():
+  song_number = random.randint(0,4)
+  songs = ['getlucky.mp3', 'cheerleader.mp3', 'partyrockers.mp3', 'shake.mp3','lifehighway.mp3']
+  return '/home/pi/music/' + songs[song_number]
+
+def get_random_eye_color():
+  color1 = ''.join('{:02X}'.format(random.randint(1,254)))
+  color2 = ''.join('{:02X}'.format(random.randint(1,254)))
+  color3 = ''.join('{:02X}'.format(random.randint(1,254)))
+  return color1 + color2 + color3
+  
+def dance():
+  write_order(serial_file, RobotOrder.DISCO_BALL, [1])
+  eye_color = get_random_eye_color()
+  left_arm_speed = random.randint(1,100)
+  right_arm_speed = random.randint(1,100)
+  left_arm_direction = random.randint(0,1)
+  right_arm_direction = random.randint(0,1)
+  
+  
+  write_order(serial_file, RobotOrder.LEFT_EYE_COLOR, get_color(eye_color))	
+  write_order(serial_file, RobotOrder.RIGHT_EYE_COLOR, get_color(eye_color))	
+  write_order(serial_file, RobotOrder.LEFT_ARM, [left_arm_direction,left_arm_speed])
+  write_order(serial_file, RobotOrder.RIGHT_ARM, [right_arm_direction,right_arm_speed])
+    
+  if player_process is not None:
+    threading.Timer(2.0, dance).start()
+	

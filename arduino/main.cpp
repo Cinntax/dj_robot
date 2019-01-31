@@ -52,7 +52,6 @@ void move(bool direction, int speed) {
     digitalWrite(WHEEL_IN4, HIGH);
   }
 
-
   analogWrite(WHEEL_PWMA, speed);
   analogWrite(WHEEL_PWMB, speed);
 }
@@ -65,7 +64,6 @@ void rotate(bool direction, int speed) {
 
     digitalWrite(WHEEL_IN3, LOW);
     digitalWrite(WHEEL_IN2, LOW);
-
   }
   else {
     digitalWrite(WHEEL_IN1, LOW);
@@ -77,16 +75,6 @@ void rotate(bool direction, int speed) {
 
   analogWrite(WHEEL_PWMA, speed);
   analogWrite(WHEEL_PWMB, speed);
-}
-
-void stop() {
-    digitalWrite(WHEEL_IN1, LOW);
-    digitalWrite(WHEEL_IN2, LOW);
-    digitalWrite(WHEEL_IN3, LOW);
-    digitalWrite(WHEEL_IN4, LOW);
-    digitalWrite(WHEEL_PWMA, LOW);
-    digitalWrite(WHEEL_PWMB, LOW);
-    analogWrite(TOP_SIGNAL, 0);
 }
 
 //Causes the left arm to spin in a given direction.
@@ -102,15 +90,7 @@ void rotateLeftArm(bool direction, int speed) {
     digitalWrite(ARM_IN2, HIGH);
   }
 
-
   analogWrite(ARM_PWMA, speed);
-}
-
-//Stops the left arm from spinning.
-void stopLeftArm() {
-  digitalWrite(ARM_IN1, LOW);
-  digitalWrite(ARM_IN2, LOW);
-  digitalWrite(ARM_PWMA, LOW);
 }
 
 //Causes the right arm to start spinning in a given direction.
@@ -126,28 +106,18 @@ void rotateRightArm(bool direction, int speed) {
     digitalWrite(ARM_IN4, HIGH);
   }
 
-
   analogWrite(ARM_PWMB, speed);
 }
 
-//Stops the right arm.
-void stopRightArm() {
-  digitalWrite(ARM_IN3, LOW);
-  digitalWrite(ARM_IN4, LOW);
-  digitalWrite(ARM_PWMB, LOW);
-}
-
 //Turn on the disco ball.
-void turnOnTop() {
-  analogWrite(TOP_SIGNAL, 190);
+void setTop(bool onOff) {
+  if(onOff)
+	analogWrite(TOP_SIGNAL, 190);
+  else
+	analogWrite(TOP_SIGNAL, 0);
 }
 
-//Turn off the disco ball.
-void turnOffTop() {
-  analogWrite(TOP_SIGNAL, 0);
-}
-
-void setLeftEyeColor(int8_t *color) {
+void setLeftEyeColor(uint8_t *color) {
 
   for(int i=0;i<NUM_PIXELS;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
@@ -156,7 +126,7 @@ void setLeftEyeColor(int8_t *color) {
   pixelsLeft.show();
 }
 
-void setRightEyeColor(int8_t *color) {
+void setRightEyeColor(uint8_t *color) {
 
   for(int i=0;i<NUM_PIXELS;i++){
     // pixels.Color takes RGB values, from 0,0,0 up to 255,255,255
@@ -185,58 +155,58 @@ void handleCommand(RobotOrder command){
     }
     case DISCO_BALL:
     {
-      turnOnTop();
+      setTop(command.data1 == 1);
       break;
     }
     case LEFT_EYE_COLOR:
     {
-	  int8_t leftEyeColor[3] = {command.data1, command.data2, command.data3};
+	  uint8_t leftEyeColor[3] = {command.data1, command.data2, command.data3};
       setLeftEyeColor(leftEyeColor);
       break;
     }
     case RIGHT_EYE_COLOR:
     {
-	  int8_t rightEyeColor[3] = {command.data1, command.data2, command.data3};
+	  uint8_t rightEyeColor[3] = {command.data1, command.data2, command.data3};
       setRightEyeColor(rightEyeColor);
       break;
     }
     case LEFT_ARM:
     {
-      rotateLeftArm(true, 100);
+      rotateLeftArm(command.data1 == 1, command.data2);
       break;
     }
     case RIGHT_ARM:
     {
-      rotateRightArm(true, 100);
+      rotateRightArm(command.data1 == 1, command.data2);
       break;
     }
     case FORWARD:
     {
-      move(true, 100);
+      move(0, command.data1);
       break;
     }
     case BACKWARD:
     {
-      move(false, 100);
+      move(1, command.data1);
       break;
     }
     case TURN_LEFT:
     {
-      rotate(true, 100);
+      rotate(0, command.data1);
       break;
     }
     case TURN_RIGHT:
     {
-      rotate(false, 100);
+      rotate(1, command.data1);
       break;
     }
     case STOP:
     {
-      stop();
-      stopLeftArm();
-      stopRightArm();
-      turnOffTop();
-	  int8_t offColor[3] = {0, 0, 0};
+      move(0,0);
+      rotateLeftArm(0,0);
+      rotateRightArm(0,0);
+      setTop(0);
+	  uint8_t offColor[3] = {0, 0, 0};
       setLeftEyeColor(offColor);
 	  setRightEyeColor(offColor);
       break;

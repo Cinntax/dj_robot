@@ -24,13 +24,15 @@ enum RobotOrderResponse {
   ALREADY_CONNECTED = 3
 };
 
+int get_order_data_bytes(RobotOrderType cmd_type);
+
 typedef enum RobotOrderType RobotOrderType;
 typedef enum RobotOrderResponse RobotOrderResponse;
 
 typedef struct RobotOrders {
   RobotOrderType type;
-  int8_t data1;
-  int8_t data2;
-  int8_t data3;
+  uint8_t data1;
+  uint8_t data2;
+  uint8_t data3;
 } RobotOrder;
 #endif

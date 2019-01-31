@@ -22,41 +22,28 @@ class RobotOrder(Enum):
     ERROR = 11
     RECEIVED = 12
     STOP = 13
+	DANCE = 14
 	
 def read_order(f):
     """
     :param f: file handler or serial file
     :return: (Order Enum Object)
     """
-    return RobotOrder(read_i8(f))
+    return RobotOrder(struct.unpack('<B', bytearray(f.read(1)))[0])
 
-def read_i8(f):
-    """
-    :param f: file handler or serial file
-    :return: (int8_t)
-    """
-    return struct.unpack('<b', bytearray(f.read(1)))[0]
-	
-def write_order(f, order):
-    """
-    :param f: file handler or serial file
-    :param order: (Order Enum Object)
-    """
-    write_i8(f, order.value)
-	
-def write_i8(f, value):
-    """
-    :param f: file handler or serial file
-    :param value: (int8_t)
-    """
-    if -128 <= value <= 127:
-        f.write(struct.pack('<b', value))
-    else:
-        print("Value error:{}".format(value))
 
-def write_color(f, value):
+def write_order(f, order, data):
     """
-    :param f: file handler or serial file
-    :param value: a 3 byte hex string that contains the RGB values of the color to send. For example ffe033
-    """
-    f.write(value.decode("hex"))
+	Writes the order and any arguments afterward.
+	"""
+	#Write the order.
+    f.write(struct.pack('<B', order.value))
+
+	#Write the following data/arguments.	
+    struct.pack("<%uB" % len(data), *data)
+
+def get_color(color_value):
+    r = color_value[:2]
+    g = color_value[2:4]
+    b = color_value[4:6]
+    return [int(r, 16), int(g, 16), int(b, 16)]

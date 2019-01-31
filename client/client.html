@@ -15,7 +15,7 @@
 		<div class="container" id="vueapp">
 			<div class="row">
 				<div class="col">
-					<button v-on:click="sendCommand(1,1)">Disco Ball</button>
+					<button v-on:click="sendCommand(1,1,1)">Disco Ball</button>
 				</div>
 			</div>
 			<div class="row">
@@ -28,33 +28,38 @@
 			</div>	
 			<div class="row">
 				<div class="col">
-				  <button v-on:click="sendCommand(4,4)">Left Arm</button>
+				  <button v-on:click="sendCommand(4,1,60)">Left Arm</button>
 				</div>
 				<div class="col">
-				  <button v-on:click="sendCommand(5,5)">Right Arm</button>
-				</div>
-			</div>	
-			<div class="row">
-				<div class="col">
-				  <button v-on:click="sendCommand(6,6)">Forward</button>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col">
-					<button v-on:click="sendCommand(8,7)">Left</button>
-				</div>
-				<div class="col">
-					<button v-on:click="sendCommand(9,7)">Right</button>
+				  <button v-on:click="sendCommand(5,1,60)">Right Arm</button>
 				</div>
 			</div>	
 			<div class="row">
 				<div class="col">
-					<button v-on:click="sendCommand(7,6)">Backward</button>	
+				  <button v-on:click="sendCommand(6,1,30)">Forward</button>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col">
-					<button v-on:click="sendCommand(13,6)">Stop</button>	
+					<button v-on:click="sendCommand(8,1,30)">Left</button>
+				</div>
+				<div class="col">
+					<button v-on:click="sendCommand(9,0,30)">Right</button>
+				</div>
+			</div>	
+			<div class="row">
+				<div class="col">
+					<button v-on:click="sendCommand(7,0,30)">Backward</button>	
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<button v-on:click="sendCommand(13,0,0)">Stop</button>	
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<button v-on:click="sendCommand(14,0,0)">Dance!</button>	
 				</div>
 			</div>
 		</div>
@@ -68,10 +73,10 @@
 					rightEyeColor: 0,
 				},
 				methods: {
-					sendCommand: function(cmd, param) {
+					sendCommand: function(cmd, param1, param2) {
 						console.log("Command: " + cmd + " Param: " + param)
 						
-						axios.get('http://10.6.24.108:5000/' + cmd + '/' + param)
+						axios.get('http://10.6.24.108:5000/' + cmd + '/' + param1 + '|' + param2)
 						  .then(function (response) {
 							// handle success
 							console.log(response);
