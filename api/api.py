@@ -29,7 +29,7 @@ def wait_for_connect():
   global is_connected
   while not is_connected:
     print("Waiting for arduino connection...")
-    write_order(serial_file, RobotOrder.HELLO)
+    write_order(serial_file, RobotOrder.HELLO, [])
     bytes_array = bytearray(serial_file.read(1))
     if not bytes_array:
       time.sleep(2)
@@ -51,7 +51,7 @@ wait_for_connect()
 	
 @app.route("/")
 def hello():
-  return "Welcome to dj robot!"
+  return app.send_static_file('client.html')
 
 @app.route('/<int:order>/<param>')
 def command(order, param):
@@ -60,16 +60,17 @@ def command(order, param):
   global player_process
   if is_connected:
     try:
-	  current_order = RobotOrder(int(order))
+      print(param)  
+      current_order = RobotOrder(int(order))
     except:
       return '{"status": "ERROR", "msg":"Invalid command."}'
 	  
-	if current_order == RobotOrder.DANCE: #We want to run this on the RPI, and not the arduino.
+    if current_order == RobotOrder.DANCE: #We want to run this on the RPI, and not the arduino.
       print("playing music...")
       if player_process is None:
         player_process = subprocess.Popen(['/usr/bin/play', get_random_song()])
         dance()
-		
+
     elif current_order == RobotOrder.STOP:
       try:
         write_order(serial_file, RobotOrder(int(order)), [])
@@ -82,21 +83,21 @@ def command(order, param):
       print("color sent in- sending.")
       write_order(serial_file, RobotOrder(int(order)), get_color(param))
     else:
-      data = param.split("|")
+      data = [int(numeric_string) for numeric_string in param.split("|")]
       write_order(serial_file, RobotOrder(int(order)), data)
     
     response = read_order(serial_file)
 	
-      if not response:
-        is_connected = False
-        return '{"status": "ERROR", "msg":"Lost connection with the arduino."}'
-      elif response == RobotOrder.RECEIVED:
-        return '{"status": "SUCCESS", "msg":"Command run successfully!"}'
-      else:
-        return '{"status": "ERROR", "msg":"The arduino failed to run your command."}'
-    
+    if not response:
+      is_connected = False
+      return '{"status": "ERROR", "msg":"Lost connection with the arduino."}'
+    elif response == RobotOrder.RECEIVED:
       return '{"status": "SUCCESS", "msg":"Command run successfully!"}'
-	  
+    else:
+      return '{"status": "ERROR", "msg":"The arduino failed to run your command."}'
+    
+    return '{"status": "SUCCESS", "msg":"Command run successfully!"}'
+ 
   else:
     return '{"status": "ERROR", "msg":"Arduino is not connected."}'
 	
@@ -112,19 +113,25 @@ def get_random_eye_color():
   return color1 + color2 + color3
   
 def dance():
-  write_order(serial_file, RobotOrder.DISCO_BALL, [1])
-  eye_color = get_random_eye_color()
-  left_arm_speed = random.randint(1,100)
-  right_arm_speed = random.randint(1,100)
-  left_arm_direction = random.randint(0,1)
-  right_arm_direction = random.randint(0,1)
-  
-  
-  write_order(serial_file, RobotOrder.LEFT_EYE_COLOR, get_color(eye_color))	
-  write_order(serial_file, RobotOrder.RIGHT_EYE_COLOR, get_color(eye_color))	
-  write_order(serial_file, RobotOrder.LEFT_ARM, [left_arm_direction,left_arm_speed])
-  write_order(serial_file, RobotOrder.RIGHT_ARM, [right_arm_direction,right_arm_speed])
-    
   if player_process is not None:
-    threading.Timer(2.0, dance).start()
-	
+    write_order(serial_file, RobotOrder.DISCO_BALL, [1])
+    eye_color = get_random_eye_color()
+    left_arm_speed = random.randint(60,100)
+    right_arm_speed = random.randint(60,100)
+    left_arm_direction = random.randint(0,1)
+    right_arm_direction = random.randint(0,1)
+    turn_direction = random.randint(1,100)
+  
+    write_order(serial_file, RobotOrder.LEFT_EYE_COLOR, get_color(eye_color))	
+    write_order(serial_file, RobotOrder.RIGHT_EYE_COLOR, get_color(eye_color))	
+    write_order(serial_file, RobotOrder.LEFT_ARM, [left_arm_direction,left_arm_speed])
+    write_order(serial_file, RobotOrder.RIGHT_ARM, [right_arm_direction,right_arm_speed])
+
+    if turn_direction < 30:
+      write_order(serial_file, RobotOrder.FORWARD, [0])
+    elif turn_direction >= 31 and turn_direction < 65:
+      write_order(serial_file, RobotOrder.TURN_LEFT, [100])
+    else:
+      write_order(serial_file, RobotOrder.TURN_RIGHT, [100])
+    
+    threading.Timer(0.5, dance).start()

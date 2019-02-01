@@ -22,7 +22,7 @@ class RobotOrder(Enum):
     ERROR = 11
     RECEIVED = 12
     STOP = 13
-	DANCE = 14
+    DANCE = 14
 	
 def read_order(f):
     """
@@ -40,7 +40,7 @@ def write_order(f, order, data):
     f.write(struct.pack('<B', order.value))
 
 	#Write the following data/arguments.	
-    struct.pack("<%uB" % len(data), *data)
+    f.write(struct.pack("<%uB" % len(data), *data))
 
 def get_color(color_value):
     r = color_value[:2]

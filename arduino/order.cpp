@@ -1,3 +1,4 @@
+#include "order.h"
 //Used to determine how many bytes of data to read as arguments into the specified commands.
 int get_order_data_bytes(RobotOrderType cmd_type) {
   int retVal = 0;

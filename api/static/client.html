@@ -28,28 +28,28 @@
 			</div>	
 			<div class="row">
 				<div class="col">
-				  <button v-on:click="sendCommand(4,1,60)">Left Arm</button>
+				  <button v-on:click="sendCommand(4,1,100)">Left Arm</button>
 				</div>
 				<div class="col">
-				  <button v-on:click="sendCommand(5,1,60)">Right Arm</button>
+				  <button v-on:click="sendCommand(5,0,100)">Right Arm</button>
 				</div>
 			</div>	
 			<div class="row">
 				<div class="col">
-				  <button v-on:click="sendCommand(6,1,30)">Forward</button>
+				  <button v-on:click="sendCommand(6,100,0)">Forward</button>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col">
-					<button v-on:click="sendCommand(8,1,30)">Left</button>
+					<button v-on:click="sendCommand(8,100,0)">Left</button>
 				</div>
 				<div class="col">
-					<button v-on:click="sendCommand(9,0,30)">Right</button>
+					<button v-on:click="sendCommand(9,100,0)">Right</button>
 				</div>
 			</div>	
 			<div class="row">
 				<div class="col">
-					<button v-on:click="sendCommand(7,0,30)">Backward</button>	
+					<button v-on:click="sendCommand(7,100,0)">Backward</button>	
 				</div>
 			</div>
 			<div class="row">
@@ -74,7 +74,7 @@
 				},
 				methods: {
 					sendCommand: function(cmd, param1, param2) {
-						console.log("Command: " + cmd + " Param: " + param)
+						console.log("Command: " + cmd + " Param: " + param1 + '|' + param2)
 						
 						axios.get('http://10.6.24.108:5000/' + cmd + '/' + param1 + '|' + param2)
 						  .then(function (response) {
@@ -87,11 +87,11 @@
 						  });
 					},
 					sendLeftEye: function() {
-						this.sendCommand(2, this.leftEyeColor.replace("#",""))
+						this.sendCommand(2, this.leftEyeColor.replace("#",""),0)
 						
 					},
 					sendRightEye: function() {
-						this.sendCommand(3, this.rightEyeColor.replace("#",""))
+						this.sendCommand(3, this.rightEyeColor.replace("#",""),0)
 					}
 				}
 			})
