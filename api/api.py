@@ -40,6 +40,9 @@ def wait_for_connect():
       is_connected = True
     print("Connected to Arduino")
     read_all_available()
+    write_order(serial_file, RobotOrder.LEFT_EYE_COLOR, get_color("008000"))
+    write_order(serial_file, RobotOrder.RIGHT_EYE_COLOR, get_color("008000"))
+    subprocess.Popen(['/usr/bin/play', '/home/pi/music/welcome.mp3'])
 
 def read_all_available():
   global serial_file
